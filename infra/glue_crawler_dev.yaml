@@ -1,0 +1,37 @@
+Resources:
+  MyDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: "yelp-crawler"
+        Description: "TestDatabaseDescription"
+        LocationUri: "TestLocationUri"
+        Parameters:
+          key1 : "value1"
+          key2 : "value2"
+ 
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "learning-aws-siri"
+      AccessControl: "BucketOwnerFullControl"
+ 
+  MyCrawler2:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "testcrawler1"
+      Role: !GetAtt MyRole.Arn
+      DatabaseName: !Ref MyDatabase
+      Classifiers:
+        - !Ref MyClassifier
+      Targets:
+        S3Targets:
+          - Path: !Ref MyS3Bucket
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Tags:
+        "Key1": "Value1"
+      Schedule:
+        ScheduleExpression: "cron(0/10 * ? * MON-FRI *)"
